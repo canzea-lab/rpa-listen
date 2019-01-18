@@ -1,14 +1,12 @@
 dist: trusty
 sudo: required
-language: java
-jdk: openjdk8
+language: nodejs
 
 services:
   - docker
 
 script:
   - set -e
-  - ./gradlew assembleDist
   - docker build -t ${PROJECT}:latest -t ${PROJECT}:$TRAVIS_COMMIT .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push ${PROJECT}:latest
