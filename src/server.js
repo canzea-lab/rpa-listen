@@ -15,6 +15,8 @@ const speech = require('./speech');
 
 var bodyParser = require('body-parser')
 
+require('./streamSocket').init();
+
 // Constants
 const PORT = 8080;
 const HOST = '0.0.0.0';

@@ -32,6 +32,30 @@ SpeechProcessor.prototype.processStream = function(stream, encoding) {
     return recognizeStream;
 }
 
+
+SpeechProcessor.prototype.getStream = function(encoding) {
+    console.log("GET STREAM " + encoding);
+
+    // Creates a client
+    const client = new speech.SpeechClient();
+
+    const request = {
+        config: {
+            encoding: encoding,
+            sampleRateHertz: 44100,
+            languageCode: 'en-US',
+        },
+        interimResults: false, // If you want interim results, set this to true
+    };
+
+    // Stream the audio to the Google Cloud Speech API
+    const recognizeStream = client
+        .streamingRecognize(request);
+
+    return recognizeStream;
+}
+
+
 SpeechProcessor.prototype.process = function(fileName) {
     console.log("PROCESS "+ fileName);
 

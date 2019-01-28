@@ -19,6 +19,7 @@ RUN npm install
 
 # Bundle app source
 COPY src .
+COPY api.json .
 
 EXPOSE 8080
 
