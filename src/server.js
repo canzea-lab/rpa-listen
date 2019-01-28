@@ -5,12 +5,15 @@ const request = require('request');
 const querystring = require('querystring');
 
 const trackRoute = express.Router();
+const bridgeRoute = express.Router();
 
 const { Readable } = require('stream');
 
 const multer = require('multer');
 
 const speech = require('./speech');
+
+var bodyParser = require('body-parser')
 
 // Constants
 const PORT = 8080;
@@ -29,6 +32,7 @@ app.use('/tracks', trackRoute);
  * POST /tracks
  */
 trackRoute.post('/', (req, res) => {
+
   const storage = multer.memoryStorage()
   const upload = multer({ storage: storage, limits: { fields: 2, fileSize: 6000000, files: 1, parts: 3 }});
   upload.single('track')(req, res, (err) => {
@@ -42,11 +46,15 @@ trackRoute.post('/', (req, res) => {
 
     let trackName = req.body.name;
     
-    console.log("Track: " + trackName);
+    console.log("Track: " + trackName + " WITH " + encoding);
 
     const readableTrackStream = new Readable();
     readableTrackStream.push(req.file.buffer);
     readableTrackStream.push(null);
+
+
+
+    // [END speech_transcribe_streaming]
 
     const recognizeStream = speech.processStream(readableTrackStream, encoding);
 
@@ -55,14 +63,16 @@ trackRoute.post('/', (req, res) => {
     });
 
     recognizeStream.on('data', response => {
+      console.log("DATA BACK");
       const transcription = response.results
         .map(result => result.alternatives[0].transcript)
         .join('\n');
-        console.log(`Transcription: ${transcription}`);
-        return res.status(200).json({ message: "File processed successfully", transcript: transcription });
+      console.log(`Transcription: ${transcription}`);
+      return res.status(200).json({ message: "File processed successfully", transcript: transcription });
     });
 
   });
+  console.log("DONE Track");
 });
 
 app.listen(PORT, HOST);
